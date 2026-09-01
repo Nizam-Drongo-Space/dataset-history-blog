@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Synthesizing the Unseeable: Dataset Creation for Low-Dose X-ray Restoration</title>
+<style>
+:root {
+  --bg: #0d1117;
+  --bg-elevated: #161b22;
+  --bg-card: #1c2128;
+  --border: #30363d;
+  --text-primary: #e6edf3;
+  --text-secondary: #9198a1;
+  --text-muted: #6e7681;
+  --accent: #58a6ff;
+  --accent-warm: #f0883e;
+  --accent-green: #3fb950;
+  --accent-amber: #d29922;
+  --accent-red: #f85149;
+  --link: #58a6ff;
+  --serif: "Georgia", "Charter", serif;
+  --sans: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --max-width: 760px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--sans);
+  line-height: 1.7;
+  margin: 0;
+  padding: 0;
+  font-size: 17px;
+}
+
+.topbar {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-elevated);
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.topbar .brand {
+  font-weight: 600;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 15px;
+  letter-spacing: 0.2px;
+}
+
+.topbar .brand span {
+  color: var(--accent);
+}
+
+.topbar nav a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 13px;
+  margin-left: 20px;
+}
+
+.topbar nav a:hover { color: var(--accent); }
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+.series-label {
+  display: inline-block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--accent-warm);
+  background: rgba(240, 136, 62, 0.1);
+  border: 1px solid rgba(240, 136, 62, 0.3);
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-family: var(--serif);
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 12px;
+  color: var(--text-primary);
+}
+
+.byline {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.post-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 56px 0 0;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+}
+
+.post-nav a {
+  flex: 1;
+  text-decoration: none;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  transition: border-color 0.15s ease;
+}
+
+.post-nav a:hover { border-color: var(--accent); }
+
+.post-nav .label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.post-nav .next { text-align: right; }
+
+h2 {
+  font-family: var(--serif);
+  font-size: 27px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 52px 0 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+h3 {
+  font-family: var(--serif);
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 36px 0 14px;
+}
+
+p { margin: 0 0 20px; color: var(--text-primary); }
+
+strong { color: #fff; font-weight: 600; }
+em { color: var(--text-secondary); font-style: italic; }
+
+a { color: var(--link); }
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 40px 0;
+}
+
+blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 24px 0;
+  padding: 4px 20px;
+  background: rgba(88, 166, 255, 0.06);
+  color: var(--text-secondary);
+  border-radius: 0 6px 6px 0;
+}
+
+figure {
+  margin: 32px 0;
+  text-align: center;
+}
+
+figure img {
+  max-width: 100%;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #fff;
+}
+
+figcaption {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin-top: 10px;
+  padding: 0 20px;
+  line-height: 1.5;
+}
+
+code {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-family: "SF Mono", Consolas, monospace;
+  font-size: 14.5px;
+  color: #ffa657;
+}
+
+.footnotes {
+  margin-top: 60px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.footnotes ol { padding-left: 20px; }
+.footnotes li { margin-bottom: 10px; }
+.footnotes a { color: var(--accent); }
+
+.footnote-ref {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 12px;
+  vertical-align: super;
+  margin-left: 1px;
+}
+
+.series-index {
+  list-style: none;
+  padding: 0;
+  margin: 32px 0;
+}
+
+.series-index li {
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-bottom: 14px;
+  transition: border-color 0.15s ease;
+}
+
+.series-index li:hover { border-color: var(--accent); }
+
+.series-index a {
+  text-decoration: none;
+  color: var(--text-primary);
+}
+
+.series-index .post-num {
+  font-size: 12px;
+  color: var(--accent-warm);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.series-index .post-title {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.series-index .post-desc {
+  color: var(--text-secondary);
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+
+.footer-note {
+  margin-top: 60px;
+  padding: 20px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 13.5px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  h1 { font-size: 30px; }
+  h2 { font-size: 22px; }
+  .container { padding: 32px 18px 60px; }
+  .post-nav { flex-direction: column; }
+  .post-nav .next { text-align: left; }
+}
+
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="index.html" class="brand">Twice Baked AI <span>&middot; Dataset History</span></a>
+</div>
+<div class="container">
+  <span class="series-label">Ongoing series</span>
+  <h1>Synthesizing the Unseeable</h1>
+  <p class="byline">Dataset creation for low-dose X-ray restoration &middot; By the Twice Baked AI Team</p>
+
+  <p style="margin-top:28px; color:var(--text-secondary); font-size:16px;">
+    Every low-dose X-ray restoration model is only as good as the data it was trained on, and
+    training data for this problem cannot exist in the way most machine learning problems expect.
+    This series documents, chronologically and honestly, every method we tried to solve that
+    problem: what worked, what failed, why, and what we learned along the way. Real numbers, real
+    training data, real failures, no smoothing over.
+  </p>
+
+  <ul class="series-index">
+    <li>
+      <a href="post1.html">
+        <span class="post-num">Part 1 of 4</span>
+        <div class="post-title">Why the Image Lies</div>
+        <div class="post-desc">The physics of low-dose noise, why paired training data can never
+          exist, and the earliest classical attempts at synthetic degradation, hand-written blur,
+          noise, structured artifacts, and haze.</div>
+      </a>
+    </li>
+    <li>
+      <a href="post2.html">
+        <span class="post-num">Part 2 of 4</span>
+        <div class="post-title">Teaching a Network to Imagine Noise</div>
+        <div class="post-desc">Three generative philosophies tried in sequence: GANs, VAEs, and
+          diffusion models, each with a genuine partial success and a specific, diagnosable
+          failure mode.</div>
+      </a>
+    </li>
+    <li>
+      <a href="post3.html">
+        <span class="post-num">Part 3 of 4</span>
+        <div class="post-title">The Physics Was There All Along</div>
+        <div class="post-desc">Going back to raw sensor data instead of processed images, the
+          locked physics noise law that's now this project's current backbone, explained down to
+          the math.</div>
+      </a>
+    </li>
+    <li>
+      <a href="post4.html">
+        <span class="post-num">Part 4 of 4</span>
+        <div class="post-title">Full Circle</div>
+        <div class="post-desc">Self-supervised learning, classical domain adaptation, and the
+          discovery that three independent methods, tried separately, all hit the exact same
+          wall.</div>
+      </a>
+    </li>
+  </ul>
+
+  <div class="footer-note">
+    Twice Baked AI Team &middot; All rights reserved &middot; This is an ongoing series, future
+    chapters will be added as new methods are tried.
+  </div>
+</div>
+</body>
+</html>
